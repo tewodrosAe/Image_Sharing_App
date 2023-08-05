@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { HiMenu } from 'react-icons/hi';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { Link, Route, Routes } from 'react-router-dom';
+import jwtDecode from 'jwt-decode';
 
 import { Sidebar, UserProfile } from '../components';
 import { userQuery } from '../utils/data';
@@ -13,12 +14,9 @@ const Home = () => {
   const [toggleSidebar, setToggleSidebar] = useState(false);
   const [user, setUser] = useState();
   const scrollRef = useRef(null);
-
-  const userInfo = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
-
+  const userInfo = localStorage.getItem('user') !== 'undefined' ? jwtDecode(JSON.parse(localStorage.getItem('user'))) : localStorage.clear();
   useEffect(() => {
-    const query = userQuery(userInfo?.googleId);
-
+    const query = userQuery(userInfo?.sub);
     client.fetch(query).then((data) => {
       setUser(data[0]);
     });

@@ -13,7 +13,11 @@ const breakpointColumnsObj = {
 
 const MasonryLayout = ({ pins }) => (
   <Masonry className="flex animate-slide-fwd" breakpointCols={breakpointColumnsObj}>
-    {pins?.map((pin) => <Pin key={pin._id} pin={pin} className="w-max" />)}
+    {pins?.map((pin) => {
+      if (pin?.image) {
+        return <Pin key={pin._id} pin={pin} className="w-max" />;
+      }
+    })}
   </Masonry>
 );
 

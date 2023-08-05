@@ -1,5 +1,4 @@
-import React from 'react';
-import Loader from 'react-loader-spinner';
+import { Circles as Loader } from 'react-loader-spinner';
 
 function Spinner({ message }) {
   return (

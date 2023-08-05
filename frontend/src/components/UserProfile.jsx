@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineLogout } from 'react-icons/ai';
 import { useParams, useNavigate } from 'react-router-dom';
-import { GoogleLogout } from 'react-google-login';
+import { googleLogout } from '@react-oauth/google';
+import jwtDecode from 'jwt-decode';
 
 import { userCreatedPinsQuery, userQuery, userSavedPinsQuery } from '../utils/data';
 import { client } from '../client';
@@ -19,8 +20,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
 
-  const User = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
-
+  const { sub: googleId } = localStorage.getItem('user') !== 'undefined' ? jwtDecode(JSON.parse(localStorage.getItem('user'))) : localStorage.clear();
   useEffect(() => {
     const query = userQuery(userId);
     client.fetch(query).then((data) => {
@@ -46,7 +46,7 @@ const UserProfile = () => {
 
   const logout = () => {
     localStorage.clear();
-
+    googleLogout();
     navigate('/login');
   };
 
@@ -58,7 +58,7 @@ const UserProfile = () => {
         <div className="relative flex flex-col mb-7">
           <div className="flex flex-col justify-center items-center">
             <img
-              className=" w-full h-370 2xl:h-510 shadow-lg object-cover"
+              className=" w-full h-280 2xl:h-510 shadow-lg object-cover"
               src="https://source.unsplash.com/1600x900/?nature,photography,technology"
               alt="user-pic"
             />
@@ -72,22 +72,16 @@ const UserProfile = () => {
             {user.userName}
           </h1>
           <div className="absolute top-0 z-1 right-0 p-2">
-            {userId === User.googleId && (
-              <GoogleLogout
-                clientId={`${process.env.REACT_APP_GOOGLE_API_TOKEN}`}
-                render={(renderProps) => (
-                  <button
-                    type="button"
-                    className=" bg-white p-2 rounded-full cursor-pointer outline-none shadow-md"
-                    onClick={renderProps.onClick}
-                    disabled={renderProps.disabled}
-                  >
-                    <AiOutlineLogout color="red" fontSize={21} />
-                  </button>
-                )}
-                onLogoutSuccess={logout}
-                cookiePolicy="single_host_origin"
-              />
+            {userId === googleId && (
+              <div>
+                <button
+                  type="button"
+                  className=" bg-white p-2 rounded-full cursor-pointer outline-none shadow-md"
+                  onClick={logout}
+                >
+                  <AiOutlineLogout color="red" fontSize={21} />
+                </button>
+              </div>
             )}
           </div>
         </div>
